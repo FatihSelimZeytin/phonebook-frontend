@@ -22,13 +22,4 @@ export const router = createRouter({
     history: createWebHistory(),
     routes,
 })
-/*
-router.beforeEach((to, from, next) => {
-    const auth = useAuthStore()
-    if (to.meta.requiresAuth && !auth.token) {
-        next('/login')
-    } else {
-        next()
-    }
-})
-*/
+
