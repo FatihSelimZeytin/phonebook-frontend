@@ -1,74 +1,88 @@
 <template>
-  <div class="bg-gray-50 py-10 px-6">
-    <div class="max-w-xl w-full mx-auto">
-      <h2 class="text-2xl font-bold mb-6">Edit Contact</h2>
+  <div class="edit-contact">
+    <h2 class="text-2xl font-bold mb-4">Edit Contact</h2>
 
-      <button type="button" class="right">
-        <router-link to="/dashboard">Back</router-link>
-      </button>
+    <form @submit.prevent="handleSubmit" class="space-y-4">
+      <div class="form-row">
+        <label for="firstName">First Name</label>
+        <input
+            v-model="firstName"
+            type="text"
+            id="firstName"
+            required
+            class="input-field"
+            placeholder="First Name"
+        />
+      </div>
 
-      <form @submit.prevent="handleSubmit" class="space-y-6">
-        <div>
-          <input
-              v-model="firstName"
-              type="text"
-              required
-              placeholder="First Name"
-              class="w-full border border-gray-300 rounded px-3 py-2"
-          />
-        </div>
+      <div class="form-row">
+        <label for="surname">Surname</label>
+        <input
+            v-model="surname"
+            type="text"
+            id="surname"
+            required
+            class="input-field"
+            placeholder="Surname"
+        />
+      </div>
 
-        <div>
-          <input
-              v-model="surname"
-              type="text"
-              required
-              placeholder="Surname"
-              class="w-full border border-gray-300 rounded px-3 py-2"
-          />
-        </div>
+      <div class="form-row">
+        <label for="company">Company</label>
+        <input
+            v-model="company"
+            type="text"
+            id="company"
+            class="input-field"
+            placeholder="Company"
+        />
+      </div>
 
-        <div>
-          <div class="space-y-4">
-            <div
-                v-for="(phone, index) in phones"
-                :key="index"
-                class="flex items-center gap-4"
+      <div class="form-row">
+        <label>Phone Numbers</label>
+        <div class="space-y-2">
+          <div
+              v-for="(phone, index) in phones"
+              :key="index"
+              class="flex items-center gap-3"
+          >
+            <input
+                v-model="phone.number"
+                type="text"
+                placeholder="Phone Number"
+                class="flex-grow input-field"
+                required
+            />
+            <button
+                type="button"
+                @click="removePhone(index)"
+                class="text-red-600 hover:underline text-sm"
             >
-              <input
-                  v-model="phones[index].number"
-                  type="text"
-                  required
-                  placeholder="Phone Number"
-                  class="flex-grow border border-gray-300 rounded px-3 py-2"
-              />
-              <button
-                  type="button"
-                  @click="removePhone(index)"
-                  class="text-red-600 hover:underline text-sm"
-              >
-                Remove
-              </button>
-            </div>
+              Remove
+            </button>
           </div>
-
           <button
               type="button"
               @click="addPhone"
-              class="mt-2 text-blue-600 hover:underline text-sm"
+              class="text-blue-600 hover:underline text-sm mt-1"
           >
             + Add another phone
           </button>
         </div>
+      </div>
 
+      <div class="buttons">
+        <button type="button">
+          <router-link to="/dashboard">Back</router-link>
+        </button>
         <button
             type="submit"
-            class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+            class="btn btn-primary"
         >
           Save Changes
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   </div>
 </template>
 
@@ -84,6 +98,7 @@ const auth = useAuthStore()
 const contactId = route.params.id
 const firstName = ref('')
 const surname = ref('')
+const company = ref('')
 const phones = ref([{ number: '' }])
 
 const addPhone = () => {
@@ -94,10 +109,10 @@ const removePhone = (index: number) => {
   phones.value.splice(index, 1)
 }
 
-// Fetch existing contact
+// Load existing contact
 onMounted(async () => {
   try {
-    const res = await fetch(`http://localhost:3000/api/contacts/${contactId}`, {
+    const res = await fetch(`http://localhost:8090/contacts/${contactId}`, {
       headers: {
         Authorization: `Bearer ${auth.token}`,
       },
@@ -108,16 +123,22 @@ onMounted(async () => {
     const data = await res.json()
     firstName.value = data.firstName
     surname.value = data.surname
-    phones.value = data.phones.length ? data.phones : [{ number: '' }]
+    company.value = data.company || ''
+    phones.value = data.phone.length ? data.phone : [{ number: '' }]
   } catch (err) {
-    alert('Error loading contact: ' + err.message)
-    await router.push('/dashboard')
+    if (err instanceof Error) {
+      alert('Error loading contact: ' + err.message)
+    } else {
+      alert('Unknown error occurred')
+    }
   }
 })
 
 const handleSubmit = async () => {
+  console.log(phones.value)
+
   try {
-    const res = await fetch(`http://localhost:3000/api/contacts/${contactId}`, {
+    const res = await fetch(`http://localhost:8080/contacts/${contactId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -126,6 +147,7 @@ const handleSubmit = async () => {
       body: JSON.stringify({
         firstName: firstName.value,
         surname: surname.value,
+        company: company.value,
         phones: phones.value,
       }),
     })
@@ -134,7 +156,7 @@ const handleSubmit = async () => {
 
     alert('Contact updated successfully!')
     await router.push('/dashboard')
-  } catch (err) {
+  } catch (err: any) {
     alert('Error: ' + err.message)
   }
 }

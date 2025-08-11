@@ -1,88 +1,100 @@
 <template>
-  <div class="bg-gray-50 py-10 px-6">
-    <div class="max-w-xl w-full mx-auto">
-      <h2 class="text-2xl font-bold mb-6">Add Contact</h2>
+  <div class="add-contact">
+    <h2 class="text-2xl font-bold mb-4">Add Contact</h2>
 
-      <button type="button" class="right"><a href="/dashboard">Back</a></button>
-      <form @submit.prevent="handleSubmit" class="space-y-6">
-        <!-- First Name -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1"></label>
-          <input
-              v-model="firstName"
-              type="text"
-              class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required placeholder="First Name"
-          />
-        </div>
+    <form @submit.prevent="handleSubmit" class="space-y-4">
+      <div class="form-row">
+        <label for="firstName">First Name</label>
+        <input
+            v-model="firstName"
+            type="text"
+            id="firstName"
+            required
+            class="input-field"
+            placeholder="First Name"
+        />
+      </div>
 
-        <!-- Surname -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1"></label>
-          <input
-              v-model="surname"
-              type="text"
-              class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required placeholder="Surname"
-          />
-        </div>
+      <div class="form-row">
+        <label for="surname">Surname</label>
+        <input
+            v-model="surname"
+            type="text"
+            id="surname"
+            required
+            class="input-field"
+            placeholder="Surname"
+        />
+      </div>
 
-        <!-- Phone Numbers -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"></label>
+      <div class="form-row">
+        <label for="company">Company</label>
+        <input
+            v-model="company"
+            type="text"
+            id="company"
+            class="input-field"
+            placeholder="Company"
+        />
+      </div>
 
-          <div class="space-y-4">
-            <div
-                v-for="(phone, index) in phones"
-                :key="index"
-                class="flex items-center gap-4"
+      <div class="form-row">
+        <label>Phone Numbers</label>
+        <div class="space-y-2">
+          <div
+              v-for="(phone, index) in phones"
+              :key="index"
+              class="flex items-center gap-3"
+          >
+            <input
+                v-model="phone.number"
+                type="text"
+                placeholder="Phone Number"
+                class="flex-grow input-field"
+                required
+            />
+            <button
+                type="button"
+                @click="removePhone(index)"
+                class="text-red-600 hover:underline text-sm"
             >
-              <input
-                  v-model="phones[index].number"
-                  type="text"
-                  placeholder="Phone Number"
-                  class="flex-grow border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-              />
-              <button
-                  type="button"
-                  @click="removePhone(index)"
-                  class="text-red-600 hover:underline text-sm"
-              >
-                Remove
-              </button>
-            </div>
+              Remove
+            </button>
           </div>
-
           <button
               type="button"
               @click="addPhone"
-              class="mt-2 text-blue-600 hover:underline text-sm"
+              class="text-blue-600 hover:underline text-sm mt-1"
           >
             + Add another phone
           </button>
         </div>
+      </div>
 
-        <!-- Submit -->
+      <div class="buttons">
+        <button type="button">
+          <a href="/dashboard">Back</a>
+        </button>
         <button
             type="submit"
-            class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+            class="btn btn-primary"
         >
           Save Contact
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuthStore } from '../store/auth'
 
 const auth = useAuthStore()
+
 const firstName = ref('')
 const surname = ref('')
+const company = ref('') // Added company field
 const phones = ref([{ number: '' }])
 
 const addPhone = () => {
@@ -94,10 +106,22 @@ const removePhone = (index: number) => {
 }
 
 const handleSubmit = async () => {
+  console.log(phones.value)
+
+  if (phones.value.length === 0) {
+    alert('Please add at least one phone number.')
+    return
+  }
+
+  if (phones.value.some(p => !p.number.trim())) {
+    alert('Please fill in all phone numbers before submitting.')
+    return
+  }
+
   try {
     const token = auth.token
 
-    const res = await fetch('http://localhost:3000/contacts', {
+    const res = await fetch('http://localhost:8090/contacts', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -106,6 +130,7 @@ const handleSubmit = async () => {
       body: JSON.stringify({
         firstName: firstName.value,
         surname: surname.value,
+        company: company.value,
         phones: phones.value,
       }),
     })
@@ -115,11 +140,12 @@ const handleSubmit = async () => {
     }
 
     alert('Contact added successfully!')
-    // Optionally reset form:
+
     firstName.value = ''
     surname.value = ''
+    company.value = ''
     phones.value = [{ number: '' }]
-  } catch (err) {
+  } catch (err: any) {
     alert('Error: ' + err.message)
   }
 }

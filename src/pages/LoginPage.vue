@@ -1,37 +1,43 @@
 <template>
-    <div class="login">
-      <h2 class="text-2xl font-bold mb-4">Login</h2>
-      <form @submit.prevent="handleLogin">
-        <div class="mb-3">
-          <label for="email" class="block font-medium"></label>
-          <input v-model="email"
-                 type="email"
-                 id="email"
-                 required
-                 class="border rounded px-3 py-2 w-full"
-                 placeholder="Email Address"/>
-        </div>
+  <div class="login">
+    <h2 class="text-2xl font-bold mb-4">Login</h2>
+    <form @submit.prevent="handleLogin">
+      <div class="form-row">
+        <label for="email">Email</label>
+        <input
+            v-model="email"
+            type="email"
+            id="email"
+            required
+            class="input-field"
+            placeholder="Email Address"
+        />
+      </div>
 
-        <div class="mb-3">
-          <label for="password" class="block font-medium"></label>
-          <input v-model="password"
-                 type="password"
-                 id="password"
-                 required
-                 class="border rounded px-3 py-2 w-full"
-                 placeholder="Password"
-          />
-        </div>
+      <div class="form-row">
+        <label for="password">Password</label>
+        <input
+            v-model="password"
+            type="password"
+            id="password"
+            required
+            class="input-field"
+            placeholder="Password"
+        />
+      </div>
 
-        <div v-if="error" class="alert alert-danger">{{ error }}</div>
+      <div v-if="error" class="alert alert-danger mb-3">{{ error }}</div>
+
+      <div class="buttons">
         <button type="button">
           <a href="/register">Register</a>
         </button>
-        <button type="submit" class="btn btn-primary w-100" :disabled="loading">
+        <button type="submit" class="btn btn-primary" :disabled="loading">
           {{ loading ? 'Logging in...' : 'Login' }}
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script lang="ts" setup>

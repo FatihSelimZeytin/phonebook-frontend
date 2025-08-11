@@ -26,7 +26,7 @@ export async function request<T>(
     const now = Date.now()
 
     // If token is about to expire (within 5s), refresh it
-    if (auth.token && auth.tokenExpiration <= now - 5000) {
+    if (auth.token && auth.tokenExpiration <= now + 5000) {
         try {
             const refreshRes = await axios.post<RefreshResponse>(
                 `${baseUrl}/auth/refresh`,

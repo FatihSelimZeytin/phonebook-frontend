@@ -13,6 +13,35 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.register {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.form-row label {
+  width: 100px;
+  font-weight: 500;
+}
+
+.input-field {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

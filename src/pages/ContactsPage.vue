@@ -16,22 +16,6 @@
         <th>Phones</th>
         <th>Options</th>
       </tr>
-      <tr>
-        <th>Test Potato</th>
-        <th>Grounded</th>
-        <th>0123456789</th>
-        <td>
-        <div class="flex gap-2 justify-center">
-          <button @click="goToEdit(contact.id)" class="edit-icon">
-            <img :src="editIcon" alt="Edit" class="w-5 h-5" />
-          </button>
-          <button @click="openModal(contact)" class="delete-icon">
-            <img :src="deleteIcon" alt="Delete" class="w-4 h-4" />
-          </button>
-
-        </div>
-      </td>
-      </tr>
       </thead>
       <tbody>
       <tr v-for="(contact, index) in contacts" :key="index">
@@ -73,29 +57,24 @@
 </template>
 
 <script setup lang="ts">
-import {useRouter} from "vue-router";
-
-const editIcon = new URL('../assets/editIcon.svg', import.meta.url).href
-const deleteIcon = new URL('../assets/deleteIcon.svg', import.meta.url).href
-
+import { useRouter } from 'vue-router'
 import * as bootstrap from 'bootstrap'
 import { onMounted, ref } from 'vue'
 import { useAuthStore } from '../store/auth'
 
-const selectedContact = ref<Contact | null>(null)
 const router = useRouter()
-
-let bootstrapModal: any = null
-const modalRef = ref<HTMLDivElement | null>(null)
-
 const auth = useAuthStore()
-const logout = () => auth.logout()
 
+const editIcon = new URL('../assets/editIcon.svg', import.meta.url).href
+const deleteIcon = new URL('../assets/deleteIcon.svg', import.meta.url).href
+
+// Interfaces
 interface Phone {
   number: string
 }
 
 interface Contact {
+  id: number
   firstName: string
   surname: string
   company?: string
@@ -103,45 +82,52 @@ interface Contact {
 }
 
 const contacts = ref<Contact[]>([])
+const selectedContact = ref<Contact | null>(null)
+const modalRef = ref<HTMLDivElement | null>(null)
 
-onMounted(() => {
+let bootstrapModal: bootstrap.Modal | null = null
+
+// Handle logout
+const logout = () => {
+  auth.logout()
+  router.push('/login')
+}
+
+// Load contacts and setup modal
+onMounted(async () => {
   if (modalRef.value) {
     bootstrapModal = new bootstrap.Modal(modalRef.value)
   }
-})
 
-onMounted(async () => {
   try {
-    const res = await fetch('http://localhost:3000/api/contacts', {
+    const res = await fetch('http://localhost:8090/contacts', {
       headers: {
         Authorization: `Bearer ${auth.token}`
       }
     })
+    if (!res.ok) throw new Error('Failed to fetch contacts')
     contacts.value = await res.json()
   } catch (err) {
     console.error('Error loading contacts:', err)
   }
 })
-function addContact() {
-  alert('Add Contact clicked!')
+
+// Modal handlers
+function openModal(contact: Contact) {
+  selectedContact.value = contact
+  bootstrapModal?.show()
+}
+
+function closeModal() {
+  bootstrapModal?.hide()
+}
+
+function confirmDelete() {
+  console.log('Deleting:', selectedContact.value)
+  closeModal()
 }
 
 function goToEdit(id: number) {
   router.push(`/editcontact/${id}`)
 }
-
-function openModal(contact: any) {
-  selectedContact.value = contact
-  bootstrapModal.show()
-}
-
-function closeModal() {
-  bootstrapModal.hide()
-}
-
-function confirmDelete() {
-  console.log("Deleting:", selectedContact.value)
-  closeModal()
-}
 </script>
-
