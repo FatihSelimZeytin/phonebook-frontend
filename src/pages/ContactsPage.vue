@@ -122,9 +122,26 @@ function closeModal() {
   bootstrapModal?.hide()
 }
 
-function confirmDelete() {
-  console.log('Deleting:', selectedContact.value)
-  closeModal()
+async function confirmDelete() {
+  if (!selectedContact.value) return;
+
+  try {
+    const res = await fetch(`http://localhost:8090/contacts/${selectedContact.value.id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${auth.token}`
+      }
+    });
+
+    if (!res.ok) throw new Error('Failed to delete contact');
+
+    // Remove from local contacts list
+    contacts.value = contacts.value.filter(c => c.id !== selectedContact.value?.id);
+
+    closeModal();
+  } catch (err) {
+    console.error('Delete failed:', err);
+  }
 }
 
 function goToEdit(id: number) {

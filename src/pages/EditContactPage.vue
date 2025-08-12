@@ -124,7 +124,7 @@ onMounted(async () => {
     firstName.value = data.firstName
     surname.value = data.surname
     company.value = data.company || ''
-    phones.value = data.phone.length ? data.phone : [{ number: '' }]
+    phones.value = data.phones && data.phones.length ? data.phones : [{ number: '' }]
   } catch (err) {
     if (err instanceof Error) {
       alert('Error loading contact: ' + err.message)
