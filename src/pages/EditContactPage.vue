@@ -138,7 +138,7 @@ const handleSubmit = async () => {
   console.log(phones.value)
 
   try {
-    const res = await fetch(`http://localhost:8080/contacts/${contactId}`, {
+    const res = await fetch(`http://localhost:8090/contacts/${contactId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
