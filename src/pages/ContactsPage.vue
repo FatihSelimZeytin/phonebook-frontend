@@ -5,6 +5,13 @@
 
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <h2 style="margin: 0;">Contacts</h2>
+      <input
+          v-model="searchQuery"
+          @input="searchContacts"
+          type="text"
+          placeholder="Search contacts..."
+          class="border rounded px-3 py-1"
+      />
       <button type="button" class="right"><a href="/addcontact">Add</a></button>
     </div>
 
@@ -147,4 +154,28 @@ async function confirmDelete() {
 function goToEdit(id: number) {
   router.push(`/editcontact/${id}`)
 }
+
+const searchQuery = ref('')
+
+const searchContacts = async () => {
+  try {
+    let url = 'http://localhost:8090/contacts'
+    if (searchQuery.value.trim() !== '') {
+      url += `/search?q=${encodeURIComponent(searchQuery.value.trim())}`
+    }
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${auth.token}`,
+      },
+    })
+
+    if (!res.ok) throw new Error('Failed to fetch contacts')
+
+    contacts.value = await res.json()
+  } catch (err) {
+    console.error('Error searching contacts:', err)
+  }
+}
+
 </script>
