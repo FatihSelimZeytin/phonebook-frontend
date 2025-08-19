@@ -157,19 +157,22 @@ const searchQuery = ref('')
 
 const searchContacts = async () => {
   try {
-    let url = '/contacts'
-    if (searchQuery.value.trim() !== '') {
-      url += `/search?q=${encodeURIComponent(searchQuery.value.trim())}`
+    const q = searchQuery.value.trim()
+    if (!q) {
+      // if you want: load all contacts instead
+      const res = await api.get('/contacts', {
+        headers: { Authorization: `Bearer ${auth.token}` },
+      })
+      contacts.value = res.data
+      return
     }
 
-    const res = await api.get(url, {
-      headers: {
-        Authorization: `Bearer ${auth.token}`,
-      },
+    const res = await api.get('/contacts/search', {
+      params: { q },
+      headers: { Authorization: `Bearer ${auth.token}` },
     })
 
     contacts.value = res.data
-
   } catch (err) {
     console.error('Error searching contacts:', err)
   }
