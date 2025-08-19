@@ -162,15 +162,14 @@ const searchContacts = async () => {
       url += `/search?q=${encodeURIComponent(searchQuery.value.trim())}`
     }
 
-    const res = await fetch(url, {
+    const res = await api.get(url, {
       headers: {
         Authorization: `Bearer ${auth.token}`,
       },
     })
 
-    if (!res.ok) throw new Error('Failed to fetch contacts')
+    contacts.value = res.data
 
-    contacts.value = await res.json()
   } catch (err) {
     console.error('Error searching contacts:', err)
   }
