@@ -1,4 +1,4 @@
-import { request } from '../lib/api'
+import { request } from './api.ts'
 import { useAuthStore } from '../store/auth'
 import type { UserLoginResponseType } from '../types/UserType'
 
