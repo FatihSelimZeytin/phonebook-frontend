@@ -4,7 +4,6 @@
     <button @click="logout">Logout</button>
 
     <div  class="d-flex justify-content-between align-items-center">
-      <h2 class="mb-0">Contacts</h2>
       <input
           v-model="searchQuery"
           @input="searchContacts"
