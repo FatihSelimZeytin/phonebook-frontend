@@ -68,6 +68,7 @@ import { useRouter } from 'vue-router'
 import * as bootstrap from 'bootstrap'
 import { onMounted, ref } from 'vue'
 import { useAuthStore } from '../store/auth'
+import api from '../services/api'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -107,13 +108,12 @@ onMounted(async () => {
   }
 
   try {
-    const res = await fetch('http://localhost:8090/contacts', {
+    const res = await api.get('/contacts', {
       headers: {
         Authorization: `Bearer ${auth.token}`
       }
     })
-    if (!res.ok) throw new Error('Failed to fetch contacts')
-    contacts.value = await res.json()
+    contacts.value = await res.data
   } catch (err) {
     console.error('Error loading contacts:', err)
   }
@@ -133,15 +133,13 @@ async function confirmDelete() {
   if (!selectedContact.value) return;
 
   try {
-    const res = await fetch(`http://localhost:8090/contacts/${selectedContact.value.id}`, {
+    const res = await api.delete(`/contacts/${selectedContact.value.id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${auth.token}`
       }
     });
-
-    if (!res.ok) throw new Error('Failed to delete contact');
-
+    console.log(res.data)
     // Remove from local contacts list
     contacts.value = contacts.value.filter(c => c.id !== selectedContact.value?.id);
 
@@ -159,7 +157,7 @@ const searchQuery = ref('')
 
 const searchContacts = async () => {
   try {
-    let url = 'http://localhost:8090/contacts'
+    let url = '/contacts'
     if (searchQuery.value.trim() !== '') {
       url += `/search?q=${encodeURIComponent(searchQuery.value.trim())}`
     }

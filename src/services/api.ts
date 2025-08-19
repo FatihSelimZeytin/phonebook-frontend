@@ -1,8 +1,10 @@
 import axios from 'axios'
 import { useAuthStore } from '../store/auth'
 
+export const defaultUrl = 'http://localhost:8090'; // Change to match your backend
+
 const api = axios.create({
-    baseURL: 'http://localhost:8090', // Change to match your backend
+    baseURL: defaultUrl,
 })
 
 api.interceptors.request.use((config) => {

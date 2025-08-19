@@ -90,6 +90,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../store/auth'
+import api from '../services/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -112,15 +113,13 @@ const removePhone = (index: number) => {
 // Load existing contact
 onMounted(async () => {
   try {
-    const res = await fetch(`http://localhost:8090/contacts/${contactId}`, {
+    const res = await api.get(`/contacts/${contactId}`, {
       headers: {
         Authorization: `Bearer ${auth.token}`,
       },
     })
-
-    if (!res.ok) throw new Error('Failed to load contact')
-
-    const data = await res.json()
+    console.log(res.data)
+    const data = await res.data
     firstName.value = data.firstName
     surname.value = data.surname
     company.value = data.company || ''
@@ -138,22 +137,22 @@ const handleSubmit = async () => {
   console.log(phones.value)
 
   try {
-    const res = await fetch(`http://localhost:8090/contacts/${contactId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${auth.token}`,
-      },
-      body: JSON.stringify({
-        firstName: firstName.value,
-        surname: surname.value,
-        company: company.value,
-        phones: phones.value,
-      }),
-    })
-
-    if (!res.ok) throw new Error('Failed to update contact')
-
+    const res = await api.put(
+        `/contacts/${contactId}`,
+        {
+          firstName: firstName.value,
+          surname: surname.value,
+          company: company.value,
+          phones: phones.value,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
+          },
+        }
+    )
+    console.log(res.data)
     alert('Contact updated successfully!')
     await router.push('/dashboard')
   } catch (err: any) {

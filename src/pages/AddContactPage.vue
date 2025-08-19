@@ -89,6 +89,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuthStore } from '../store/auth'
+import api from '../services/api'
 
 const auth = useAuthStore()
 
@@ -121,24 +122,22 @@ const handleSubmit = async () => {
   try {
     const token = auth.token
 
-    const res = await fetch('http://localhost:8090/contacts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        firstName: firstName.value,
-        surname: surname.value,
-        company: company.value,
-        phones: phones.value,
-      }),
-    })
-
-    if (!res.ok) {
-      throw new Error('Failed to create contact')
-    }
-
+    const res = await api.post(
+        '/contacts',
+        {
+          firstName: firstName.value,
+          surname: surname.value,
+          company: company.value,
+          phones: phones.value,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+    )
+    console.log(res.data)
     alert('Contact added successfully!')
 
     firstName.value = ''
