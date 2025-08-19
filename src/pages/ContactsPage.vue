@@ -3,8 +3,8 @@
     <h2>Contacts</h2>
     <button @click="logout">Logout</button>
 
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h2 style="margin: 0;">Contacts</h2>
+    <div  class="d-flex justify-content-between align-items-center">
+      <h2 class="mb-0">Contacts</h2>
       <input
           v-model="searchQuery"
           @input="searchContacts"
