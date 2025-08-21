@@ -68,10 +68,3 @@ const handleRegister = async () => {
   }
 }
 </script>
-
-<style scoped>
-.register {
-  max-width: 400px;
-  margin: 50px auto;
-}
-</style>
